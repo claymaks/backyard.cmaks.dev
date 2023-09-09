@@ -55,11 +55,16 @@ function validateForm() {
     x = document.getElementsByClassName("tab");
     y = x[currentTab].getElementsByTagName("input");
 
-    if (document.getElementById("player_names").value.split('\n').filter(n => n).length % 2 === 1) {
+    let boys = document.getElementById("player_boys").value.split('\n').filter(n => n).length;
+    let girls = document.getElementById("player_girls").value.split('\n').filter(n => n).length;
+
+    if (boys !== girls) {
         valid = false;
-        document.getElementById("player_names").className = "invalid";
+        document.getElementById("player_boys").className = "invalid";
+        document.getElementById("player_girls").className = "invalid";
     } else {
-        document.getElementById("player_names").className = "";
+        document.getElementById("player_boys").className = "";
+        document.getElementById("player_girls").className = "";
     }
     // A loop that checks every input field in the current tab:
     // For backyard games, should only be 1.
@@ -115,7 +120,7 @@ let select_pairs_element = document.getElementById("pairs");
 let pillbox = document.getElementById("pillbox");
 let selected_tile = null;
 function load_players() {
-    let all_player_names = document.getElementById("player_names").value.split('\n').filter(n => n);
+    let all_player_names = document.getElementById("player_boys").value.split('\n').filter(n => n).concat(document.getElementById("player_girls").value.split('\n').filter(n => n));
     for (let i = 0; i < all_player_names.length; i++) {
         // Skip names that already exist.
         if (players.findIndex(player => {

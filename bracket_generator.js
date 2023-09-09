@@ -20,18 +20,29 @@ function pair_name(name1, name2) {
     return name1 + " & " + name2;
 }
 
-function generate_teams_of_two(players, preassigned) {
+function generate_teams_of_two(players_boys, players_girls, preassigned) {
     let team_list = preassigned;
 
     for (let i = 0; i < preassigned.length; i++) {
         let team = preassigned[i].split(" & ");
-        players.splice(players.indexOf(team[0]), 1);
-        players.splice(players.indexOf(team[1]), 1);
+        if (players_boys.includes(team[0])) {
+            players_boys.splice(players_boys.indexOf(team[0]), 1);
+        }
+        if (players_boys.includes(team[1])) {
+            players_boys.splice(players_boys.indexOf(team[1]), 1);
+        }
+        if (players_girls.includes(team[0])) {
+            players_girls.splice(players_girls.indexOf(team[0]), 1);
+        }
+        if (players_girls.includes(team[1])) {
+            players_girls.splice(players_girls.indexOf(team[1]), 1);
+        }
     }
 
-    let shuffled_players = shuffle(players);
-    for (let i = 0; i < shuffled_players.length; i+=2) {
-        team_list.push(pair_name(shuffled_players[i], shuffled_players[i+1]));
+    let shuffled_boys = shuffle(players_boys);
+    let shuffled_girls = shuffle(players_girls);
+    for (let i = 0; i < shuffled_boys.length; i++) {
+        team_list.push(pair_name(shuffled_girls[i], shuffled_boys[i]));
     }
 
     return team_list;
@@ -151,15 +162,16 @@ function main() {
     console.log(queryString);
     const urlParams = new URLSearchParams(queryString);
 
-    let players = urlParams.get("player_names").split('\r\n').filter(n => n);
+    let player_girls = urlParams.get("player_girls").split('\r\n').filter(n => n);
+    let player_boys = urlParams.get("player_boys").split('\r\n').filter(n => n);
     let preassigned = urlParams.get("teammates").split('\r\n').filter(n => n);
     let num_games = parseInt(urlParams.get("num_games"));
 
-    console.log("Players: " + players);
+    console.log("Players: " + player_boys + player_girls);
     console.log("Preassigned teammates: " + preassigned);
     console.log("Num_games: " + num_games);
 
-    let raw_teams = generate_teams_of_two(players, preassigned);
+    let raw_teams = generate_teams_of_two(player_boys, player_girls, preassigned);
     console.log("Teams: " + raw_teams);
     let teams = [];
     for (let i = 0; i < raw_teams.length; i++) {
