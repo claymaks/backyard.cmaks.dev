@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="index.css">
+    <link rel="stylesheet" type="text/css" href="manual_team_selector.css" />
+    <title>Backyard Games</title>
+</head>
+<body>
+<h1>Create Tournament</h1>
+    <form id="regForm" action="/bracket.html">
+        <!-- One "tab" for each step in the form: -->
+        <div class="tab">Players (list each name on a new line):<br><br>
+            <div style="text-align: center;">
+                 <textarea id="player_names" name="player_names" rows="25" cols="50">
+Haley
+Jaret
+</textarea>
+            </div>
+
+        </div>
+        <div class="tab">Pre-select teams. Anyone not assigned to a team will be randomly assigned.
+            <div class="pillbox" id="pillbox"></div>
+            <div class="container" id="pairs"></div>
+            <p style="display:none"><textarea id="teammates" name="teammates" rows="1" cols="1"></textarea></p>
+        </div>
+        <div class="tab">How many games are there? Note: if there are multiple sets of each game, count them both.
+            <p><input placeholder="0" oninput="this.className = ''" name="num_games"></p>
+        </div>
+        <div style="overflow:auto;">
+            <div style="float:right;">
+                <button type="button" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
+                <button type="button" id="nextBtn" onclick="nextPrev(1)">Next</button>
+            </div>
+        </div>
+        <!-- Circles which indicates the steps of the form: -->
+        <div style="text-align:center;margin-top:40px;">
+            <span class="step"></span>
+            <span class="step"></span>
+            <span class="step"></span>
+        </div>
+    </form>
+</body>
+
+<script src="index.js"></script>
+</html>
