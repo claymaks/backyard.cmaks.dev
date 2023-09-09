@@ -11,6 +11,18 @@
 <body>
 <h1>Create Tournament</h1>
     <form id="regForm" action="/bracket.html">
+        <div style="overflow:auto;">
+            <div style="float:right;">
+                <button type="button" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
+                <button type="button" id="nextBtn" onclick="nextPrev(1)">Next</button>
+            </div>
+        </div>
+        <!-- Circles which indicates the steps of the form: -->
+        <div style="text-align:center;margin-top:40px;">
+            <span class="step"></span>
+            <span class="step"></span>
+            <span class="step"></span>
+        </div>
         <!-- One "tab" for each step in the form: -->
         <div class="tab">Players (boys on left, girls on right):<br><br>
             <div style="text-align: center;">
@@ -31,18 +43,7 @@ Haley
         <div class="tab">How many games are there? Note: if there are multiple sets of each game, count them both.
             <p><input placeholder="0" oninput="this.className = ''" name="num_games"></p>
         </div>
-        <div style="overflow:auto;">
-            <div style="float:right;">
-                <button type="button" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
-                <button type="button" id="nextBtn" onclick="nextPrev(1)">Next</button>
-            </div>
-        </div>
-        <!-- Circles which indicates the steps of the form: -->
-        <div style="text-align:center;margin-top:40px;">
-            <span class="step"></span>
-            <span class="step"></span>
-            <span class="step"></span>
-        </div>
+
     </form>
 </body>
 
