@@ -68,13 +68,12 @@ function check_valid_pair(team, slot_num, slot, game) {
         game: game,
         opponent: ""
     };
-    console.log(team);
     return true;
 }
 
 function undo_place(team, game, slot_num) {
-    team.rounds_participated.remove(slot_num);
-    team.games_played.remove(game);
+    team.rounds_participated.delete(slot_num);
+    team.games_played.delete(game);
 }
 
 function make_schedule(teams, num_games) {
@@ -84,6 +83,8 @@ function make_schedule(teams, num_games) {
             unscheduled.push([teams[team], j]);
         }
     }
+
+    unscheduled = shuffle(unscheduled);
 
     console.log(unscheduled);
 
@@ -115,24 +116,28 @@ function make_schedule(teams, num_games) {
         }
     }
 
-    console.log(schedule);
+    console.log("HERE");
 
-    for (let i = 0; i < schedule.length; i++) {
-        for (let k = 0; k < schedule[i].length; k++) {
-            if (schedule[i][k].length !== 1) { continue; }
+    console.log(schedule[0].length);
 
-            let op = schedule[i][k].pop(0);
-            undo_place(op, i, k);
-
-            for (let k2 = 0; k < schedule[i].length; k2++) {
-                if (k === k2) { continue; }
-                op.my_games[k2].game = i;
-                if (! check_valid_pair(op, k2, schedule[game][k2], game)) { continue; }
-                schedule[i][k2].push(op);
-                break;
-            }
-        }
-    }
+    // for (let repeat = 0; repeat < 10; repeat++) {
+    //     for (let i = 0; i < num_games; i++) {
+    //         for (let k = 0; k < schedule[i].length; k++) {
+    //             if (schedule[i][k].length !== 1) { continue; }
+    //
+    //             let op = schedule[i][k].pop();
+    //             undo_place(op, i, k);
+    //
+    //             for (let k2 = 0; k < schedule[i].length; k2++) {
+    //                 if (k === k2) { continue; }
+    //                 if (! check_valid_pair(op, k2, schedule[i][k2], i)) { continue; }
+    //                 console.log("pushing back")
+    //                 schedule[i][k2].push(op);
+    //                 break;
+    //             }
+    //         }
+    //     }
+    // }
 
     return {
         schedule: schedule,
@@ -177,8 +182,9 @@ function main() {
     thead.appendChild(trh);
     table.appendChild(thead);
 
+    let count = 0;
+
     let tbody = document.createElement("tbody");
-    console.log(updated_teams);
     for (let i = 0; i < updated_teams.length; i++) {
         let trb = document.createElement("tr");
         let th = document.createElement("th");
@@ -191,6 +197,7 @@ function main() {
                     td.innerText = "Playing game " + (updated_teams[i].my_games[k].game + 1) + " against " + updated_teams[i].my_games[k].opponent;
                 } else {
                     td.innerText = "Playing game " + (updated_teams[i].my_games[k].game + 1) + ", but no opponent scheduled!";
+                    count += 1;
                     td.className += "red-highlight";
                 }
             }
@@ -199,6 +206,11 @@ function main() {
         tbody.appendChild(trb);
     }
     table.appendChild(tbody);
+    console.log(count);
+
+    for (let i = 0; i < schedule.length; i++) {
+
+    }
 
     return schedule
 }
