@@ -9,7 +9,8 @@
     <title>Backyard Games</title>
 </head>
 <body>
-<h1>Create Tournament</h1>
+<h1>Backyard Games Tournament Generator</h1>
+<p style="text-align: center; max-width: 800px; margin: 0 auto 20px;">Create a fair tournament schedule where teams rotate through different games and play against different opponents each round.</p>
     <form id="regForm" action="/bracket.html">
         <div style="overflow:auto;">
             <div style="float:right;">
@@ -24,24 +25,34 @@
             <span class="step"></span>
         </div>
         <!-- One "tab" for each step in the form: -->
-        <div class="tab">Players (boys on left, girls on right):<br><br>
+        <div class="tab">
+            <h3>Enter Players</h3>
+            <p>Enter player names (one per line). Each player from Group A will be paired with a player from Group B to form teams.</p>
             <div style="text-align: center;">
-                 <textarea id="player_boys" name="player_boys" rows="25" cols="20">
-Jaret
+                <div style="display: inline-block; margin: 0 10px;">
+                    <label for="player_boys"><strong>Player Group A</strong></label><br>
+                    <textarea id="player_boys" name="player_boys" rows="25" cols="20">Jaret
 </textarea>
-                <textarea id="player_girls" name="player_girls" rows="25" cols="20">
-Haley
+                </div>
+                <div style="display: inline-block; margin: 0 10px;">
+                    <label for="player_girls"><strong>Player Group B</strong></label><br>
+                    <textarea id="player_girls" name="player_girls" rows="25" cols="20">Haley
 </textarea>
+                </div>
             </div>
 
         </div>
-        <div class="tab">Pre-select teams. Anyone not assigned to a team will be randomly assigned.
+        <div class="tab">
+            <h3>Pre-select Teams (Optional)</h3>
+            <p>Click on two player names to pair them as a team. Anyone not assigned to a team will be randomly paired.</p>
             <div class="pillbox" id="pillbox"></div>
             <div class="container" id="pairs"></div>
             <p style="display:none"><textarea id="teammates" name="teammates" rows="1" cols="1"></textarea></p>
         </div>
-        <div class="tab">How many games are there? Note: if there are multiple sets of each game, count them both.
-            <p><input placeholder="0" oninput="this.className = ''" name="num_games"></p>
+        <div class="tab">
+            <h3>Number of Games</h3>
+            <p>Enter the total number of different games available for the tournament. Each team will rotate through playing different games against different opponents.</p>
+            <p><input placeholder="e.g., 3" oninput="this.className = ''" name="num_games"></p>
         </div>
 
     </form>

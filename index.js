@@ -58,16 +58,25 @@ function validateForm() {
     let boys = document.getElementById("player_boys").value.split('\n').filter(n => n).length;
     let girls = document.getElementById("player_girls").value.split('\n').filter(n => n).length;
 
-    if (boys !== girls) {
-        valid = false;
-        document.getElementById("player_boys").className = "invalid";
-        document.getElementById("player_girls").className = "invalid";
-    } else {
-        document.getElementById("player_boys").className = "";
-        document.getElementById("player_girls").className = "";
+    // Check if we're on the first tab (player input)
+    if (currentTab === 0) {
+        if (boys !== girls) {
+            valid = false;
+            document.getElementById("player_boys").className = "invalid";
+            document.getElementById("player_girls").className = "invalid";
+            alert("Please enter the same number of players in both groups. Group A has " + boys + " players, Group B has " + girls + " players.");
+        } else if (boys < 2) {
+            valid = false;
+            document.getElementById("player_boys").className = "invalid";
+            document.getElementById("player_girls").className = "invalid";
+            alert("Please enter at least 2 players in each group to create teams.");
+        } else {
+            document.getElementById("player_boys").className = "";
+            document.getElementById("player_girls").className = "";
+        }
     }
+    
     // A loop that checks every input field in the current tab:
-    // For backyard games, should only be 1.
     for (i = 0; i < y.length; i++) {
         // If a field is empty...
         if (y[i].value === "") {
