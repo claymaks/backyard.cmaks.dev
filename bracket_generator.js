@@ -146,13 +146,14 @@ function make_schedule(teams, num_games) {
                 if (schedule[i][k].length !== 1) { continue; }
 
                 let op = schedule[i][k].pop();
-                let opponentName = op.my_games[k] && op.my_games[k].opponent ? op.my_games[k].opponent : null;
+                let opponentName = (op.my_games && op.my_games[k] && op.my_games[k].opponent) ? op.my_games[k].opponent : null;
                 undo_place(op, i, k, opponentName);
 
                 for (let k2 = 0; k2 < schedule[i].length; k2++) {
                     if (k === k2) { continue; }
                     if (!check_valid_pair(op, k2, schedule[i][k2], i)) { continue; }
                     console.log("Rematching unpaired team:", op.name);
+                    // check_valid_pair already initialized op.my_games[k2], now set opponent
                     if (schedule[i][k2].length === 1) {
                         op.my_games[k2].opponent = schedule[i][k2][0].name;
                         schedule[i][k2][0].my_games[k2] = {
