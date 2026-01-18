@@ -3,8 +3,10 @@
 }
 
 body {
-    background-color: #f1f1f1;
+    background-color: #ffffff;
     overflow-x: hidden;
+    margin: 0;
+    padding: 20px;
 }
 
 #regForm {
@@ -12,44 +14,80 @@ body {
     margin: 20px auto;
     font-family: Raleway, sans-serif;
     padding: 40px;
-    width: 70%;
+    width: 90%;
+    max-width: 900px;
     min-width: 300px;
     max-height: calc(100vh - 150px);
     overflow-y: hidden;
-    border-radius: 10px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e8e8e8;
 }
 
 h1 {
     text-align: center;
     font-family: Raleway, sans-serif;
-    color: #0433aa;
+    color: #1a1a1a;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 20px auto;
+    max-width: 900px;
 }
 
 h3 {
     font-family: Raleway, sans-serif;
-    color: #0433aa;
+    color: #1a1a1a;
     margin-bottom: 10px;
+    font-size: 1.5rem;
+    font-weight: 600;
 }
 
 label {
     font-family: Raleway, sans-serif;
     font-size: 14px;
+    color: #4a4a4a;
+    font-weight: 500;
 }
 
 input {
-    padding: 10px;
+    padding: 12px 16px;
     width: 100%;
-    font-size: 17px;
+    font-size: 16px;
     font-family: Raleway, sans-serif;
-    border: 1px solid #aaaaaa;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 /* Mark input boxes that gets an error on validation: */
 input.invalid {
-    background-color: #ffdddd;
+    background-color: #fef2f2;
+    border-color: #ef4444;
 }
 textarea.invalid {
-    background-color: #ffdddd;
+    background-color: #fef2f2;
+    border-color: #ef4444;
+}
+
+textarea {
+    padding: 12px 16px;
+    font-size: 16px;
+    font-family: Raleway, sans-serif;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 /* Hide all steps by default: */
@@ -58,40 +96,95 @@ textarea.invalid {
 }
 
 button {
-    background-color: #0433aa;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     color: #ffffff;
     border: none;
-    padding: 10px 20px;
-    font-size: 17px;
+    padding: 12px 28px;
+    font-size: 16px;
     font-family: Raleway, sans-serif;
+    font-weight: 600;
     cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
 }
 
 button:hover {
-    opacity: 0.8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+button:active {
+    transform: translateY(0);
 }
 
 #prevBtn {
-    background-color: #bbbbbb;
+    background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+    box-shadow: 0 2px 8px rgba(100, 116, 139, 0.3);
+}
+
+#prevBtn:hover {
+    box-shadow: 0 4px 12px rgba(100, 116, 139, 0.4);
 }
 
 /* Make circles that indicate the steps of the form: */
 .step {
-    height: 15px;
-    width: 15px;
-    margin: 0 2px;
-    background-color: #bbbbbb;
+    height: 16px;
+    width: 16px;
+    margin: 0 4px;
+    background-color: #e0e0e0;
     border: none;
     border-radius: 50%;
     display: inline-block;
-    opacity: 0.5;
+    opacity: 0.6;
+    transition: all 0.3s ease;
 }
 
 .step.active {
     opacity: 1;
+    background-color: #6366f1;
+    transform: scale(1.2);
 }
 
 /* Mark the steps that are finished and valid: */
 .step.finish {
-    background-color: #0454aa;
+    background-color: #10b981;
+    opacity: 1;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+        margin: 10px auto 20px;
+    }
+    
+    #regForm {
+        padding: 20px;
+        width: 100%;
+        border-radius: 12px;
+    }
+    
+    h3 {
+        font-size: 1.3rem;
+    }
+    
+    button {
+        padding: 10px 20px;
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    #regForm {
+        padding: 15px;
+    }
 }
