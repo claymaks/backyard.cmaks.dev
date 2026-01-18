@@ -1,10 +1,25 @@
+body {
+    font-family: Raleway, sans-serif;
+    background-color: #f1f1f1;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    color: #0433aa;
+    margin: 20px 0;
+}
+
 .styled-table {
     border-collapse: collapse;
-    margin: 25px 0;
+    margin: 25px auto;
     font-size: 0.9em;
     font-family: sans-serif;
     min-width: 400px;
+    width: 100%;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    background-color: white;
 }
 
 .styled-table thead tr {
@@ -36,6 +51,7 @@
 }
 
 .red-highlight {
-    background-color: #a03c3c;
+    background-color: #e74c3c;
     color: white;
+    font-weight: bold;
 }

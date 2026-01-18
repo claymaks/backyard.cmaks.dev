@@ -63,10 +63,14 @@ function Team(name) {
 }
 
 function check_valid_pair(team, slot_num, slot, game) {
+    // Can't play in same round twice
     if (team.rounds_participated.has(slot_num)) { return false; }
-    if (slot.length === 1 && team.opponents_played_against.has(slot[0].name)) { return false; }
+    // Can't play against yourself
     if (slot.length === 1 && slot[0].name === team.name) { return false; }
+    // Slot is full
     if (slot.length === 2) { return false; }
+    // Can't play the same game twice
+    if (team.games_played.has(game)) { return false; }
 
     team.rounds_participated.add(slot_num);
     if (slot.length > 0) {
@@ -82,9 +86,13 @@ function check_valid_pair(team, slot_num, slot, game) {
     return true;
 }
 
-function undo_place(team, game, slot_num) {
+function undo_place(team, game, slot_num, opponent_name) {
     team.rounds_participated.delete(slot_num);
     team.games_played.delete(game);
+    if (opponent_name) {
+        team.opponents_played_against.delete(opponent_name);
+    }
+    delete team.my_games[slot_num];
 }
 
 function make_schedule(teams, num_games) {
@@ -99,10 +107,11 @@ function make_schedule(teams, num_games) {
 
     console.log(unscheduled);
 
+    // Create the right number of slots per game: teams.length / 2 (since each slot holds 2 teams)
     let schedule = {};
     for (let i = 0; i < num_games; i++) {
         schedule[i] = [];
-        for (let k = 0; k < Math.floor(unscheduled.length/2); k++) {
+        for (let k = 0; k < Math.floor(teams.length / 2); k++) {
             schedule[i].push([]);
         }
     }
@@ -127,28 +136,39 @@ function make_schedule(teams, num_games) {
         }
     }
 
-    console.log("HERE");
+    console.log("Schedule created with", schedule[0].length, "slots per game");
 
-    console.log(schedule[0].length);
+    // Try to fix any unpaired teams by rematching
+    for (let repeat = 0; repeat < 10; repeat++) {
+        let fixedAny = false;
+        for (let i = 0; i < num_games; i++) {
+            for (let k = 0; k < schedule[i].length; k++) {
+                if (schedule[i][k].length !== 1) { continue; }
 
-    // for (let repeat = 0; repeat < 10; repeat++) {
-    //     for (let i = 0; i < num_games; i++) {
-    //         for (let k = 0; k < schedule[i].length; k++) {
-    //             if (schedule[i][k].length !== 1) { continue; }
-    //
-    //             let op = schedule[i][k].pop();
-    //             undo_place(op, i, k);
-    //
-    //             for (let k2 = 0; k < schedule[i].length; k2++) {
-    //                 if (k === k2) { continue; }
-    //                 if (! check_valid_pair(op, k2, schedule[i][k2], i)) { continue; }
-    //                 console.log("pushing back")
-    //                 schedule[i][k2].push(op);
-    //                 break;
-    //             }
-    //         }
-    //     }
-    // }
+                let op = schedule[i][k].pop();
+                let opponentName = (op.my_games && op.my_games[k] && op.my_games[k].opponent) ? op.my_games[k].opponent : null;
+                undo_place(op, i, k, opponentName);
+
+                for (let k2 = 0; k2 < schedule[i].length; k2++) {
+                    if (k === k2) { continue; }
+                    if (!check_valid_pair(op, k2, schedule[i][k2], i)) { continue; }
+                    console.log("Rematching unpaired team:", op.name);
+                    // check_valid_pair already initialized op.my_games[k2], now set opponent
+                    if (schedule[i][k2].length === 1) {
+                        op.my_games[k2].opponent = schedule[i][k2][0].name;
+                        schedule[i][k2][0].my_games[k2] = {
+                            opponent: op.name,
+                            game: i,
+                        };
+                    }
+                    schedule[i][k2].push(op);
+                    fixedAny = true;
+                    break;
+                }
+            }
+        }
+        if (!fixedAny) break;
+    }
 
     return {
         schedule: schedule,
