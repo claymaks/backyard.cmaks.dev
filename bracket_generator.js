@@ -209,10 +209,21 @@ function main() {
     console.log(queryString);
     const urlParams = new URLSearchParams(queryString);
 
-    let player_girls = urlParams.get("player_girls").split(/\r?\n/).filter(n => n);
-    let player_boys = urlParams.get("player_boys").split(/\r?\n/).filter(n => n);
-    let preassigned = urlParams.get("teammates").split(/\r?\n/).filter(n => n);
-    let num_games = parseInt(urlParams.get("num_games"));
+    let player_girls_param = urlParams.get("player_girls");
+    let player_boys_param = urlParams.get("player_boys");
+    let teammates_param = urlParams.get("teammates");
+    let num_games_param = urlParams.get("num_games");
+    
+    if (!player_girls_param || !player_boys_param || !num_games_param) {
+        alert('Invalid tournament data. Please create a new tournament.');
+        window.location.href = 'index.html';
+        return;
+    }
+
+    let player_girls = player_girls_param.split(/\r?\n/).filter(n => n);
+    let player_boys = player_boys_param.split(/\r?\n/).filter(n => n);
+    let preassigned = (teammates_param || '').split(/\r?\n/).filter(n => n);
+    let num_games = parseInt(num_games_param);
 
     console.log("Players: " + player_boys + player_girls);
     console.log("Preassigned teammates: " + preassigned);
