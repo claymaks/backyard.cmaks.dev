@@ -209,9 +209,9 @@ function main() {
     console.log(queryString);
     const urlParams = new URLSearchParams(queryString);
 
-    let player_girls = urlParams.get("player_girls").split('\r\n').filter(n => n);
-    let player_boys = urlParams.get("player_boys").split('\r\n').filter(n => n);
-    let preassigned = urlParams.get("teammates").split('\r\n').filter(n => n);
+    let player_girls = urlParams.get("player_girls").split(/\r?\n/).filter(n => n);
+    let player_boys = urlParams.get("player_boys").split(/\r?\n/).filter(n => n);
+    let preassigned = urlParams.get("teammates").split(/\r?\n/).filter(n => n);
     let num_games = parseInt(urlParams.get("num_games"));
 
     console.log("Players: " + player_boys + player_girls);
@@ -234,9 +234,9 @@ function main() {
         for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
             updateProgressDisplay(attempt, MAX_ATTEMPTS);
             
-            // Allow UI to update every 5 attempts
+            // Allow UI to update every 5 attempts with a small delay
             if (attempt % 5 === 1 && attempt > 1) {
-                await new Promise(resolve => setTimeout(resolve, 1));
+                await new Promise(resolve => setTimeout(resolve, 10));
             }
             
             // Create fresh team objects for each attempt
@@ -282,6 +282,12 @@ function main() {
         schedule = result.schedule;
         updated_teams = result.updated_teams;
         renderSchedule(schedule, updated_teams, raw_teams, player_girls, player_boys, preassigned, num_games);
+    }).catch(error => {
+        console.error('Tournament generation failed:', error);
+        let progressDiv = document.getElementById("generation-progress");
+        if (progressDiv) {
+            progressDiv.innerHTML = '<p style="color: #dc3545;">Failed to generate tournament. Please try again with different parameters.</p>';
+        }
     });
 }
 
@@ -325,10 +331,6 @@ function renderSchedule(schedule, updated_teams, raw_teams, player_girls, player
     table.appendChild(tbody);
     console.log(count);
     console.log('Rendered schedule:', schedule);
-
-    for (let i = 0; i < schedule.length; i++) {
-
-    }
     
     // Save tournament to localStorage
     saveTournament({

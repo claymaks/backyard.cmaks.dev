@@ -349,9 +349,9 @@ function viewTournament(index) {
         
         // Build the URL with query parameters
         let params = new URLSearchParams();
-        params.append('player_girls', tournament.player_girls.join('\r\n'));
-        params.append('player_boys', tournament.player_boys.join('\r\n'));
-        params.append('teammates', tournament.preassigned.join('\r\n'));
+        params.append('player_girls', tournament.player_girls.join('\n'));
+        params.append('player_boys', tournament.player_boys.join('\n'));
+        params.append('teammates', tournament.preassigned.join('\n'));
         params.append('num_games', tournament.num_games);
         
         window.location.href = 'bracket.html?' + params.toString();
