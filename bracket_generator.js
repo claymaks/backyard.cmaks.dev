@@ -193,7 +193,14 @@ function countScheduleErrors(teams) {
 function updateProgressDisplay(attempt, maxAttempts) {
     let progressDiv = document.getElementById("generation-progress");
     if (progressDiv) {
-        progressDiv.innerHTML = `<p>Generating tournament bracket... Attempt ${attempt} of ${maxAttempts}</p>`;
+        let percentage = Math.floor((attempt / maxAttempts) * 100);
+        progressDiv.innerHTML = `
+            <p style="margin: 0 0 10px 0; font-weight: bold;">Generating tournament bracket...</p>
+            <p style="margin: 0; color: #666;">Attempt ${attempt} of ${maxAttempts}</p>
+            <div style="width: 100%; background-color: #ddd; border-radius: 10px; margin-top: 10px; height: 20px;">
+                <div style="width: ${percentage}%; background-color: #0433aa; height: 20px; border-radius: 10px; transition: width 0.3s;"></div>
+            </div>
+        `;
     }
 }
 
@@ -222,43 +229,63 @@ function main() {
     let bestAttempt = null;
     let bestErrorCount = Infinity;
     
-    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-        updateProgressDisplay(attempt, MAX_ATTEMPTS);
-        
-        // Create fresh team objects for each attempt
-        let teams = [];
-        for (let i = 0; i < raw_teams.length; i++) {
-            teams.push(Team(raw_teams[i]));
+    // Use async function to allow UI updates
+    async function tryGenerateSchedule() {
+        for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+            updateProgressDisplay(attempt, MAX_ATTEMPTS);
+            
+            // Allow UI to update
+            if (attempt % 10 === 0) {
+                await new Promise(resolve => setTimeout(resolve, 0));
+            }
+            
+            // Create fresh team objects for each attempt
+            let teams = [];
+            for (let i = 0; i < raw_teams.length; i++) {
+                teams.push(Team(raw_teams[i]));
+            }
+            
+            schedule_and_teams = make_schedule(teams, num_games);
+            schedule = schedule_and_teams.schedule;
+            updated_teams = schedule_and_teams.teams;
+            
+            let errorCount = countScheduleErrors(updated_teams);
+            
+            if (errorCount === 0) {
+                console.log(`Found valid schedule on attempt ${attempt}`);
+                break;
+            }
+            
+            if (errorCount < bestErrorCount) {
+                bestErrorCount = errorCount;
+                bestAttempt = { schedule, updated_teams };
+            }
         }
         
-        schedule_and_teams = make_schedule(teams, num_games);
-        schedule = schedule_and_teams.schedule;
-        updated_teams = schedule_and_teams.teams;
-        
-        let errorCount = countScheduleErrors(updated_teams);
-        
-        if (errorCount === 0) {
-            console.log(`Found valid schedule on attempt ${attempt}`);
-            break;
+        // Use best attempt if we didn't find a perfect schedule
+        if (countScheduleErrors(updated_teams) > 0 && bestAttempt) {
+            schedule = bestAttempt.schedule;
+            updated_teams = bestAttempt.updated_teams;
         }
         
-        if (errorCount < bestErrorCount) {
-            bestErrorCount = errorCount;
-            bestAttempt = { schedule, updated_teams };
+        // Hide progress display
+        let progressDiv = document.getElementById("generation-progress");
+        if (progressDiv) {
+            progressDiv.style.display = 'none';
         }
+        
+        return { schedule, updated_teams };
     }
     
-    // Use best attempt if we didn't find a perfect schedule
-    if (countScheduleErrors(updated_teams) > 0 && bestAttempt) {
-        schedule = bestAttempt.schedule;
-        updated_teams = bestAttempt.updated_teams;
-    }
-    
-    // Hide progress display
-    let progressDiv = document.getElementById("generation-progress");
-    if (progressDiv) {
-        progressDiv.style.display = 'none';
-    }
+    // Run the async generation
+    tryGenerateSchedule().then(result => {
+        schedule = result.schedule;
+        updated_teams = result.updated_teams;
+        renderSchedule(schedule, updated_teams, raw_teams, player_girls, player_boys, preassigned, num_games);
+    });
+}
+
+function renderSchedule(schedule, updated_teams, raw_teams, player_girls, player_boys, preassigned, num_games) {
 
     let table = document.getElementById("bracket");
     let thead = document.createElement("thead");
