@@ -184,15 +184,18 @@ function sync_teammates() {
 }
 
 function onTileClick(event) {
-    var tile = event.target;
+    // Get the tile element, whether we clicked on it or its child
+    var tile = event.target.classList.contains('tile') ? event.target : event.target.parentElement;
+    var p = tile.querySelector('p');
+    
     if (selected_tile === null) {
         selected_tile = tile;
         tile.style.background = "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)";
-        tile.querySelector('p').style.color = "#ffffff";
+        if (p) p.style.color = "#ffffff";
     } else if (selected_tile === tile) {
         selected_tile = null;
         tile.style.background = "linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%)";
-        tile.querySelector('p').style.color = "#1e293b";
+        if (p) p.style.color = "#1e293b";
     } else {
         var pair1 = player_from_uuid[tile.dataset.uuid];
         var pair2 = player_from_uuid[selected_tile.dataset.uuid];
