@@ -234,9 +234,9 @@ function main() {
         for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
             updateProgressDisplay(attempt, MAX_ATTEMPTS);
             
-            // Allow UI to update
-            if (attempt % 10 === 0) {
-                await new Promise(resolve => setTimeout(resolve, 0));
+            // Allow UI to update every 5 attempts
+            if (attempt % 5 === 1 && attempt > 1) {
+                await new Promise(resolve => setTimeout(resolve, 1));
             }
             
             // Create fresh team objects for each attempt
@@ -324,6 +324,7 @@ function renderSchedule(schedule, updated_teams, raw_teams, player_girls, player
     }
     table.appendChild(tbody);
     console.log(count);
+    console.log('Rendered schedule:', schedule);
 
     for (let i = 0; i < schedule.length; i++) {
 
@@ -369,5 +370,4 @@ function saveTournament(tournamentData) {
     }
 }
 
-let schedule = main();
-console.log(schedule);
+main();

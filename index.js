@@ -304,20 +304,35 @@ function loadPreviousTournaments() {
             let date = new Date(tournament.date);
             let dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
             
-            tournamentDiv.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <strong>Tournament from ${dateStr}</strong><br>
-                        <span style="color: #666; font-size: 0.9em;">
-                            ${tournament.teams.length} teams, ${tournament.num_games} games
-                        </span>
-                    </div>
-                    <div>
-                        <button onclick="viewTournament(${i})" style="margin-right: 10px; padding: 8px 15px; background-color: #0433aa; color: white; border: none; border-radius: 4px; cursor: pointer;">View</button>
-                        <button onclick="deleteTournament(${i})" style="padding: 8px 15px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">Delete</button>
-                    </div>
-                </div>
+            let contentDiv = document.createElement('div');
+            contentDiv.style.cssText = 'display: flex; justify-content: space-between; align-items: center;';
+            
+            let infoDiv = document.createElement('div');
+            infoDiv.innerHTML = `
+                <strong>Tournament from ${dateStr}</strong><br>
+                <span style="color: #666; font-size: 0.9em;">
+                    ${tournament.teams.length} teams, ${tournament.num_games} games
+                </span>
             `;
+            
+            let buttonsDiv = document.createElement('div');
+            
+            let viewBtn = document.createElement('button');
+            viewBtn.textContent = 'View';
+            viewBtn.style.cssText = 'margin-right: 10px; padding: 8px 15px; background-color: #0433aa; color: white; border: none; border-radius: 4px; cursor: pointer;';
+            viewBtn.addEventListener('click', () => viewTournament(i));
+            
+            let deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.style.cssText = 'padding: 8px 15px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;';
+            deleteBtn.addEventListener('click', () => deleteTournament(i));
+            
+            buttonsDiv.appendChild(viewBtn);
+            buttonsDiv.appendChild(deleteBtn);
+            
+            contentDiv.appendChild(infoDiv);
+            contentDiv.appendChild(buttonsDiv);
+            tournamentDiv.appendChild(contentDiv);
             
             listDiv.appendChild(tournamentDiv);
         }
