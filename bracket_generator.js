@@ -177,15 +177,53 @@ function make_schedule(teams, num_games) {
 }
 
 let test_string = "?player_names=Haley%0D%0AJaret%0D%0AClay%0D%0AAn%0D%0AAnna%0D%0AAlex&teammates=An+%26+Clay%0D%0AJaret+%26+Haley%0D%0A&num_games=2"
+
+function countScheduleErrors(teams) {
+    let errorCount = 0;
+    for (let i = 0; i < teams.length; i++) {
+        for (let round in teams[i].my_games) {
+            if (!teams[i].my_games[round].opponent) {
+                errorCount++;
+            }
+        }
+    }
+    return errorCount;
+}
+
+function updateProgressDisplay(attempt, maxAttempts) {
+    let progressDiv = document.getElementById("generation-progress");
+    if (progressDiv) {
+        let percentage = Math.floor((attempt / maxAttempts) * 100);
+        progressDiv.innerHTML = `
+            <p style="margin: 0 0 10px 0; font-weight: bold;">Generating tournament bracket...</p>
+            <p style="margin: 0; color: #666;">Attempt ${attempt} of ${maxAttempts}</p>
+            <div style="width: 100%; background-color: #ddd; border-radius: 10px; margin-top: 10px; height: 20px;">
+                <div style="width: ${percentage}%; background-color: #0433aa; height: 20px; border-radius: 10px; transition: width 0.3s;"></div>
+            </div>
+        `;
+    }
+}
+
 function main() {
     const queryString = window.location.search;
     console.log(queryString);
     const urlParams = new URLSearchParams(queryString);
 
-    let player_girls = urlParams.get("player_girls").split('\r\n').filter(n => n);
-    let player_boys = urlParams.get("player_boys").split('\r\n').filter(n => n);
-    let preassigned = urlParams.get("teammates").split('\r\n').filter(n => n);
-    let num_games = parseInt(urlParams.get("num_games"));
+    let player_girls_param = urlParams.get("player_girls");
+    let player_boys_param = urlParams.get("player_boys");
+    let teammates_param = urlParams.get("teammates");
+    let num_games_param = urlParams.get("num_games");
+    
+    if (!player_girls_param || !player_boys_param || !num_games_param) {
+        alert('Invalid tournament data. Please create a new tournament.');
+        window.location.href = 'index.html';
+        return;
+    }
+
+    let player_girls = player_girls_param.split(/\r?\n/).filter(n => n);
+    let player_boys = player_boys_param.split(/\r?\n/).filter(n => n);
+    let preassigned = (teammates_param || '').split(/\r?\n/).filter(n => n);
+    let num_games = parseInt(num_games_param);
 
     console.log("Players: " + player_boys + player_girls);
     console.log("Preassigned teammates: " + preassigned);
@@ -193,14 +231,78 @@ function main() {
 
     let raw_teams = generate_teams_of_two(player_boys, player_girls, preassigned);
     console.log("Teams: " + raw_teams);
-    let teams = [];
-    for (let i = 0; i < raw_teams.length; i++) {
-        teams.push(Team(raw_teams[i]));
+    
+    // Try to generate a valid schedule with retries
+    const MAX_ATTEMPTS = 100;
+    let schedule_and_teams;
+    let schedule;
+    let updated_teams;
+    let bestAttempt = null;
+    let bestErrorCount = Infinity;
+    
+    // Use async function to allow UI updates
+    async function tryGenerateSchedule() {
+        for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+            updateProgressDisplay(attempt, MAX_ATTEMPTS);
+            
+            // Allow UI to update every 5 attempts with a small delay
+            if (attempt % 5 === 1 && attempt > 1) {
+                await new Promise(resolve => setTimeout(resolve, 10));
+            }
+            
+            // Create fresh team objects for each attempt
+            let teams = [];
+            for (let i = 0; i < raw_teams.length; i++) {
+                teams.push(Team(raw_teams[i]));
+            }
+            
+            schedule_and_teams = make_schedule(teams, num_games);
+            schedule = schedule_and_teams.schedule;
+            updated_teams = schedule_and_teams.teams;
+            
+            let errorCount = countScheduleErrors(updated_teams);
+            
+            if (errorCount === 0) {
+                console.log(`Found valid schedule on attempt ${attempt}`);
+                break;
+            }
+            
+            if (errorCount < bestErrorCount) {
+                bestErrorCount = errorCount;
+                bestAttempt = { schedule, updated_teams };
+            }
+        }
+        
+        // Use best attempt if we didn't find a perfect schedule
+        if (countScheduleErrors(updated_teams) > 0 && bestAttempt) {
+            schedule = bestAttempt.schedule;
+            updated_teams = bestAttempt.updated_teams;
+        }
+        
+        // Hide progress display
+        let progressDiv = document.getElementById("generation-progress");
+        if (progressDiv) {
+            progressDiv.style.display = 'none';
+        }
+        
+        return { schedule, updated_teams };
     }
+    
+    // Run the async generation
+    tryGenerateSchedule().then(result => {
+        schedule = result.schedule;
+        updated_teams = result.updated_teams;
+        renderSchedule(schedule, updated_teams, raw_teams, player_girls, player_boys, preassigned, num_games);
+    }).catch(error => {
+        console.error('Tournament generation failed:', error);
+        let progressDiv = document.getElementById("generation-progress");
+        if (progressDiv) {
+            progressDiv.innerHTML = '<p style="color: #dc3545;">Failed to generate tournament. Please try again with different parameters.</p>';
+        }
+    });
+}
 
-    let schedule_and_teams = make_schedule(teams, num_games);
-    let schedule = schedule_and_teams.schedule;
-    let updated_teams = schedule_and_teams.teams;
+function renderSchedule(schedule, updated_teams, raw_teams, player_girls, player_boys, preassigned, num_games) {
 
     let table = document.getElementById("bracket");
     let thead = document.createElement("thead");
@@ -239,13 +341,46 @@ function main() {
     }
     table.appendChild(tbody);
     console.log(count);
-
-    for (let i = 0; i < schedule.length; i++) {
-
-    }
+    console.log('Rendered schedule:', schedule);
+    
+    // Save tournament to localStorage
+    saveTournament({
+        date: new Date().toISOString(),
+        player_girls: player_girls,
+        player_boys: player_boys,
+        preassigned: preassigned,
+        num_games: num_games,
+        teams: raw_teams,
+        schedule: serializeSchedule(updated_teams, schedule)
+    });
 
     return schedule
 }
 
-let schedule = main();
-console.log(schedule);
+function serializeSchedule(teams, schedule) {
+    let serialized = [];
+    for (let i = 0; i < teams.length; i++) {
+        serialized.push({
+            name: teams[i].name,
+            games: teams[i].my_games
+        });
+    }
+    return serialized;
+}
+
+function saveTournament(tournamentData) {
+    try {
+        let tournaments = JSON.parse(localStorage.getItem('tournaments') || '[]');
+        tournaments.unshift(tournamentData);
+        // Keep only last 10 tournaments
+        if (tournaments.length > 10) {
+            tournaments = tournaments.slice(0, 10);
+        }
+        localStorage.setItem('tournaments', JSON.stringify(tournaments));
+        console.log('Tournament saved to localStorage');
+    } catch (e) {
+        console.error('Failed to save tournament:', e);
+    }
+}
+
+main();

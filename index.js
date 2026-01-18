@@ -279,3 +279,105 @@ function populate_pills(pairs) {
         pillbox.appendChild(pill);
     }
 }
+
+// ----------------------------------------------------------------------------
+// Previous Tournaments
+// ----------------------------------------------------------------------------
+
+function loadPreviousTournaments() {
+    try {
+        let tournaments = JSON.parse(localStorage.getItem('tournaments') || '[]');
+        let listDiv = document.getElementById('tournaments-list');
+        
+        if (tournaments.length === 0) {
+            listDiv.innerHTML = '<p style="text-align: center; color: #666;">No previous tournaments yet. Create your first tournament above!</p>';
+            return;
+        }
+        
+        listDiv.innerHTML = '';
+        
+        for (let i = 0; i < tournaments.length; i++) {
+            let tournament = tournaments[i];
+            let tournamentDiv = document.createElement('div');
+            tournamentDiv.style.cssText = 'background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);';
+            
+            let date = new Date(tournament.date);
+            let dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+            
+            let contentDiv = document.createElement('div');
+            contentDiv.style.cssText = 'display: flex; justify-content: space-between; align-items: center;';
+            
+            let infoDiv = document.createElement('div');
+            infoDiv.innerHTML = `
+                <strong>Tournament from ${dateStr}</strong><br>
+                <span style="color: #666; font-size: 0.9em;">
+                    ${tournament.teams.length} teams, ${tournament.num_games} games
+                </span>
+            `;
+            
+            let buttonsDiv = document.createElement('div');
+            
+            let viewBtn = document.createElement('button');
+            viewBtn.textContent = 'View';
+            viewBtn.style.cssText = 'margin-right: 10px; padding: 8px 15px; background-color: #0433aa; color: white; border: none; border-radius: 4px; cursor: pointer;';
+            viewBtn.addEventListener('click', () => viewTournament(i));
+            
+            let deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.style.cssText = 'padding: 8px 15px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;';
+            deleteBtn.addEventListener('click', () => deleteTournament(i));
+            
+            buttonsDiv.appendChild(viewBtn);
+            buttonsDiv.appendChild(deleteBtn);
+            
+            contentDiv.appendChild(infoDiv);
+            contentDiv.appendChild(buttonsDiv);
+            tournamentDiv.appendChild(contentDiv);
+            
+            listDiv.appendChild(tournamentDiv);
+        }
+    } catch (e) {
+        console.error('Failed to load tournaments:', e);
+        document.getElementById('tournaments-list').innerHTML = '<p style="text-align: center; color: #dc3545;">Error loading previous tournaments.</p>';
+    }
+}
+
+function viewTournament(index) {
+    try {
+        let tournaments = JSON.parse(localStorage.getItem('tournaments') || '[]');
+        let tournament = tournaments[index];
+        
+        // Build the URL with query parameters
+        let params = new URLSearchParams();
+        params.append('player_girls', tournament.player_girls.join('\n'));
+        params.append('player_boys', tournament.player_boys.join('\n'));
+        params.append('teammates', tournament.preassigned.join('\n'));
+        params.append('num_games', tournament.num_games);
+        
+        window.location.href = 'bracket.html?' + params.toString();
+    } catch (e) {
+        console.error('Failed to view tournament:', e);
+        alert('Error loading tournament');
+    }
+}
+
+function deleteTournament(index) {
+    if (!confirm('Are you sure you want to delete this tournament?')) {
+        return;
+    }
+    
+    try {
+        let tournaments = JSON.parse(localStorage.getItem('tournaments') || '[]');
+        tournaments.splice(index, 1);
+        localStorage.setItem('tournaments', JSON.stringify(tournaments));
+        loadPreviousTournaments();
+    } catch (e) {
+        console.error('Failed to delete tournament:', e);
+        alert('Error deleting tournament');
+    }
+}
+
+// Load previous tournaments when page loads
+window.addEventListener('DOMContentLoaded', function() {
+    loadPreviousTournaments();
+});
