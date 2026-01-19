@@ -9,17 +9,19 @@
     <title>Backyard Games</title>
 </head>
 <body>
-<h1>Backyard Games Tournament Generator</h1>
-<p style="text-align: center; max-width: 800px; margin: 0 auto 20px;">Create a fair tournament schedule where teams rotate through different games and play against different opponents each round.</p>
+<div class="hero-section">
+    <h1>Backyard Games Tournament Generator</h1>
+    <p class="subtitle">Create a fair tournament schedule where teams rotate through different games and play against different opponents each round.</p>
+</div>
     <form id="regForm" action="/bracket.html">
-        <div style="overflow:auto;">
-            <div style="float:right;">
+        <div class="form-controls">
+            <div class="button-group">
                 <button type="button" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
                 <button type="button" id="nextBtn" onclick="nextPrev(1)">Next</button>
             </div>
         </div>
         <!-- Circles which indicates the steps of the form: -->
-        <div style="text-align:center;margin-top:40px;">
+        <div class="step-indicators">
             <span class="step"></span>
             <span class="step"></span>
             <span class="step"></span>
@@ -27,16 +29,16 @@
         <!-- One "tab" for each step in the form: -->
         <div class="tab">
             <h3>Enter Players</h3>
-            <p>Enter player names (one per line). Each player from Group A will be paired with a player from Group B to form teams.</p>
-            <div style="text-align: center;">
-                <div style="display: inline-block; margin: 0 10px;">
-                    <label for="player_boys"><strong>Player Group A</strong></label><br>
-                    <textarea id="player_boys" name="player_boys" rows="25" cols="20">Jaret
+            <p class="tab-description">Enter player names (one per line). Each player from Group A will be paired with a player from Group B to form teams.</p>
+            <div class="player-input-container">
+                <div class="player-group">
+                    <label for="player_boys"><strong>Player Group A</strong></label>
+                    <textarea id="player_boys" name="player_boys" rows="12" placeholder="Enter names, one per line...">Jaret
 </textarea>
                 </div>
-                <div style="display: inline-block; margin: 0 10px;">
-                    <label for="player_girls"><strong>Player Group B</strong></label><br>
-                    <textarea id="player_girls" name="player_girls" rows="25" cols="20">Haley
+                <div class="player-group">
+                    <label for="player_girls"><strong>Player Group B</strong></label>
+                    <textarea id="player_girls" name="player_girls" rows="12" placeholder="Enter names, one per line...">Haley
 </textarea>
                 </div>
             </div>
@@ -51,14 +53,16 @@
         </div>
         <div class="tab">
             <h3>Number of Games</h3>
-            <p>Enter the total number of different games available for the tournament. Each team will rotate through playing different games against different opponents.</p>
-            <p><input placeholder="e.g., 3" oninput="this.className = ''" name="num_games"></p>
+            <p class="tab-description">Enter the total number of different games available for the tournament. Each team will rotate through playing different games against different opponents.</p>
+            <div class="number-input-container">
+                <input type="number" min="1" placeholder="e.g., 3" oninput="this.className = ''" name="num_games">
+            </div>
         </div>
 
     </form>
     
-    <div id="previous-tournaments" style="max-width: 1000px; margin: 40px auto; padding: 20px; background-color: #f9f9f9; border-radius: 10px;">
-        <h2 style="text-align: center;">Previous Tournaments</h2>
+    <div id="previous-tournaments" class="previous-tournaments-section">
+        <h2>Previous Tournaments</h2>
         <div id="tournaments-list"></div>
     </div>
 </body>

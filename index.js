@@ -184,13 +184,18 @@ function sync_teammates() {
 }
 
 function onTileClick(event) {
-    var tile = event.target;
+    // Get the tile element, whether we clicked on it or its child
+    var tile = event.target.classList.contains('tile') ? event.target : event.target.parentElement;
+    var p = tile.querySelector('p');
+    
     if (selected_tile === null) {
         selected_tile = tile;
-        tile.style.backgroundColor = "#85a2ff";
+        tile.style.background = "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)";
+        if (p) p.style.color = "#ffffff";
     } else if (selected_tile === tile) {
         selected_tile = null;
-        tile.style.backgroundColor = "#d2dcff";
+        tile.style.background = "linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%)";
+        if (p) p.style.color = "#1e293b";
     } else {
         var pair1 = player_from_uuid[tile.dataset.uuid];
         var pair2 = player_from_uuid[selected_tile.dataset.uuid];
@@ -299,32 +304,57 @@ function loadPreviousTournaments() {
         for (let i = 0; i < tournaments.length; i++) {
             let tournament = tournaments[i];
             let tournamentDiv = document.createElement('div');
-            tournamentDiv.style.cssText = 'background-color: white; padding: 15px; margin: 10px 0; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);';
+            tournamentDiv.style.cssText = 'background-color: white; padding: 20px; margin: 12px 0; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.3s ease;';
+            tournamentDiv.onmouseenter = function() {
+                this.style.boxShadow = '0 4px 16px rgba(0,0,0,0.12)';
+                this.style.transform = 'translateY(-2px)';
+            };
+            tournamentDiv.onmouseleave = function() {
+                this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+                this.style.transform = 'translateY(0)';
+            };
             
             let date = new Date(tournament.date);
             let dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
             
             let contentDiv = document.createElement('div');
-            contentDiv.style.cssText = 'display: flex; justify-content: space-between; align-items: center;';
+            contentDiv.style.cssText = 'display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;';
             
             let infoDiv = document.createElement('div');
             infoDiv.innerHTML = `
-                <strong>Tournament from ${dateStr}</strong><br>
-                <span style="color: #666; font-size: 0.9em;">
+                <strong style="color: #1a1a1a; font-size: 1.05em;">Tournament from ${dateStr}</strong><br>
+                <span style="color: #64748b; font-size: 0.9em;">
                     ${tournament.teams.length} teams, ${tournament.num_games} games
                 </span>
             `;
             
             let buttonsDiv = document.createElement('div');
+            buttonsDiv.style.cssText = 'display: flex; gap: 10px;';
             
             let viewBtn = document.createElement('button');
             viewBtn.textContent = 'View';
-            viewBtn.style.cssText = 'margin-right: 10px; padding: 8px 15px; background-color: #0433aa; color: white; border: none; border-radius: 4px; cursor: pointer;';
+            viewBtn.style.cssText = 'padding: 10px 20px; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);';
+            viewBtn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 4px 12px rgba(99, 102, 241, 0.4)';
+            });
+            viewBtn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 2px 8px rgba(99, 102, 241, 0.3)';
+            });
             viewBtn.addEventListener('click', () => viewTournament(i));
             
             let deleteBtn = document.createElement('button');
             deleteBtn.textContent = 'Delete';
-            deleteBtn.style.cssText = 'padding: 8px 15px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;';
+            deleteBtn.style.cssText = 'padding: 10px 20px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);';
+            deleteBtn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.4)';
+            });
+            deleteBtn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 2px 8px rgba(239, 68, 68, 0.3)';
+            });
             deleteBtn.addEventListener('click', () => deleteTournament(i));
             
             buttonsDiv.appendChild(viewBtn);
